@@ -20,7 +20,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.easy_control"
-        minSdk = 30
+        //minSdk = 30
+        minSdk = 27
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

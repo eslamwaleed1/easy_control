@@ -18,13 +18,11 @@ class MainActivity : FlutterActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Set up MethodChannel
         val channel = MethodChannel(flutterEngine!!.dartExecutor.binaryMessenger, CHANNEL)
         channel.setMethodCallHandler { call, result ->
             when (call.method) {
                 "startOverlay" -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-                        //Log.d(TAG, "Requesting overlay permission")
                         val intent = Intent(
                             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                             Uri.parse("package:$packageName")
@@ -32,13 +30,11 @@ class MainActivity : FlutterActivity() {
                         startActivityForResult(intent, OVERLAY_PERMISSION_REQUEST_CODE)
                         result.success(false)
                     } else {
-                        //Log.d(TAG, "Starting OverlayService")
                         startService(Intent(this, OverlayService::class.java))
                         result.success(true)
                     }
                 }
                 "stopOverlay" -> {
-                    //Log.d(TAG, "Stopping OverlayService")
                     stopService(Intent(this, OverlayService::class.java))
                     result.success(true)
                 }
@@ -50,8 +46,10 @@ class MainActivity : FlutterActivity() {
                     //Log.d(TAG, "Received gaze: ($x, $y), Calibrated: $isCalibrated")
                     val intent = Intent(this, OverlayService::class.java).apply {
                         action = "UPDATE_GAZE"
-                        putExtra("x", x)
-                        putExtra("y", y)
+                        //putExtra("x", x)
+                        putExtra("x", ((x/540)*1080))
+                        putExtra("y", ((y/1097)*2194))
+                        //putExtra("y", y)
                         putExtra("isCalibrated", isCalibrated)
                         putExtra("screenState", screenState)
                     }

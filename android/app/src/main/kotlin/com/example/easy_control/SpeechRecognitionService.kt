@@ -25,6 +25,7 @@ class SpeechRecognitionService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        Log.d(TAG, "Service created")
         setupSpeechRecognizer()
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, createNotification())
@@ -32,15 +33,28 @@ class SpeechRecognitionService : Service() {
     }
 
     private fun setupSpeechRecognizer() {
+        // Check if SpeechRecognizer is available
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            Log.e(TAG, "Speech recognition not available on this device")
+            stopSelf() // Stop the service if recognition isn't available
+            return
+        }
+
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+        if (speechRecognizer == null) {
+            Log.e(TAG, "Failed to create SpeechRecognizer")
+            stopSelf()
+            return
+        }
+        Log.d(TAG, "SpeechRecognizer created successfully")
+
         recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
-            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 30000)
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 5000)
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 5000)
+            // Removed EXTRA_PREFER_OFFLINE to improve compatibility; use online if needed
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 10000L) // 10 seconds
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2000L) // 2 seconds
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2000L) // 2 seconds
         }
 
         speechRecognizer?.setRecognitionListener(object : RecognitionListener {
@@ -53,16 +67,21 @@ class SpeechRecognitionService : Service() {
                 Log.d(TAG, "Beginning of speech")
             }
 
-            override fun onRmsChanged(rmsdB: Float) {}
+            override fun onRmsChanged(rmsdB: Float) {
+                // Optional: Log for debugging audio levels
+                Log.v(TAG, "RMS changed: $rmsdB")
+            }
 
-            override fun onBufferReceived(buffer: ByteArray?) {}
+            override fun onBufferReceived(buffer: ByteArray?) {
+                Log.d(TAG, "Buffer received, length: ${buffer?.size ?: 0}")
+            }
 
             override fun onEndOfSpeech() {
                 Log.d(TAG, "End of speech")
                 isListening = false
                 Handler(Looper.getMainLooper()).postDelayed({
                     if (!isListening) startListening()
-                }, 2000)
+                }, 1000) // Reduced delay to 1 second for faster restart
             }
 
             override fun onError(error: Int) {
@@ -78,7 +97,7 @@ class SpeechRecognitionService : Service() {
                     SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Speech timeout"
                     else -> "Unknown error: $error"
                 }
-                Log.e(TAG, "Error: $errorMsg")
+                Log.e(TAG, "Speech recognition error: $errorMsg")
                 isListening = false
                 Handler(Looper.getMainLooper()).postDelayed({
                     if (!isListening) startListening()
@@ -89,28 +108,41 @@ class SpeechRecognitionService : Service() {
                 val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 matches?.firstOrNull()?.let { text ->
                     Log.d(TAG, "Heard (final): $text")
+                    Log.d(TAG, "Posting to LiveData: $text")
                     SpeechRecognitionLiveData.postRecognizedWord(text)
-                }
+                } ?: Log.w(TAG, "No matches in final results")
             }
 
             override fun onPartialResults(partialResults: Bundle?) {
-                val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                matches?.firstOrNull()?.let { text ->
-                    Log.d(TAG, "Heard (partial): $text")
-                    SpeechRecognitionLiveData.postRecognizedWord(text)
-                }
+                Log.d(TAG, "Partial results received (ignored)")
             }
 
-            override fun onEvent(eventType: Int, params: Bundle?) {}
+            override fun onEvent(eventType: Int, params: Bundle?) {
+                Log.d(TAG, "Event: $eventType")
+            }
         })
     }
 
     private fun startListening() {
+        if (speechRecognizer == null) {
+            Log.e(TAG, "SpeechRecognizer is null, reinitializing")
+            setupSpeechRecognizer()
+            if (speechRecognizer == null) {
+                Log.e(TAG, "Failed to reinitialize SpeechRecognizer, stopping service")
+                stopSelf()
+                return
+            }
+        }
         try {
-            speechRecognizer?.startListening(recognizerIntent)
-            Log.d(TAG, "Started listening")
+            if (!isListening) {
+                speechRecognizer?.startListening(recognizerIntent)
+                Log.d(TAG, "Started listening")
+            } else {
+                Log.w(TAG, "Already listening, skipping start")
+            }
         } catch (e: Exception) {
-            Log.e(TAG, "Error starting listening: ${e.message}")
+            Log.e(TAG, "Error starting listening: ${e.message}", e)
+            isListening = false
             Handler(Looper.getMainLooper()).postDelayed({
                 if (!isListening) startListening()
             }, 2000)
@@ -122,7 +154,7 @@ class SpeechRecognitionService : Service() {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Speech Recognition Service",
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_DEFAULT // Increased to DEFAULT for better visibility
             ).apply {
                 description = "Channel for speech recognition service"
             }
@@ -135,12 +167,12 @@ class SpeechRecognitionService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Speech Recognition")
             .setContentText("Listening for speech...")
-            //.setSmallIcon(android.R.drawable.ic_notification_active)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "onStartCommand called")
         return START_STICKY
     }
 
@@ -148,6 +180,7 @@ class SpeechRecognitionService : Service() {
         speechRecognizer?.stopListening()
         speechRecognizer?.destroy()
         speechRecognizer = null
+        isListening = false
         stopForeground(true)
         Log.d(TAG, "Service destroyed")
         super.onDestroy()

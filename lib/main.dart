@@ -26,10 +26,10 @@ class _MyAppState extends State<MyApp> {
   final _eyedidFlutterPlugin = EyedidFlutter();
   static const String _licenseKey = "dev_ksoope3xnjczb23pijyn4j3b07qq5hxalrwhlh0z";
   static const MethodChannel _channel = MethodChannel('com.example.easy_control/overlay');
-  double _x = 0.0, _y = 0.0;
-
-  double _smoothedX = 0.0, _smoothedY = 0.0;
   bool _hasCameraPermission = false;
+
+  double _x = 0.0, _y = 0.0;
+  double _smoothedX = 0.0, _smoothedY = 0.0;
   bool _isCalibrated = false;
   bool _isTracking = false;
   String _statusMessage = "Initializing...";
@@ -72,7 +72,7 @@ class _MyAppState extends State<MyApp> {
       try {
         final options = GazeTrackerOptionsBuilder()
             .setPreset(CameraPreset.vga640x480)
-            .setUseGazeFilter(true)  //false
+            .setUseGazeFilter(true)
             .setUseBlink(false)
             .setUseUserStatus(false)
             //.setMaxConcurrency(2)
@@ -91,7 +91,7 @@ class _MyAppState extends State<MyApp> {
         } else {
           print("Eyedid initialization failed");
           setState(() {
-            _statusMessage = "Eyedid initialization failed";
+            _statusMessage = "Eyedid initialization failed: ${initializedResult.message}.";
           });
         }
       } on PlatformException catch (e) {
@@ -102,6 +102,9 @@ class _MyAppState extends State<MyApp> {
       }
     }
   }
+  // Future<void> initEyedid() async {
+  //   await startOverlay();
+  // }
 
   void listenEvents() {
     _eyedidFlutterPlugin.getTrackingEvent().listen((event) async {
@@ -111,34 +114,14 @@ class _MyAppState extends State<MyApp> {
       double x = info.gazeInfo.gaze.x;
       double y = info.gazeInfo.gaze.y;
 
-      /*Try out switching between fixation and succade*/
-      // var fixationX = info.gazeInfo.fixation.fixationX;
-      // var fixationY = info.gazeInfo.fixation.fixationY;
-      // if (info.gazeInfo.trackingState == TrackingState.success) {
-      //   double x = info.gazeInfo.gaze.x;
-      //   double y = info.gazeInfo.gaze.y;
-      // }
-      // else {
-      //   double x = -1001;
-      //   double y = -1001;
-      // }
-
-
-      const double alpha = 0.4;  //0.9    Maybe the dot keeps insanely going to edges because of this?!
+      const double alpha = 0.4;
       _smoothedX = alpha * x + (1 - alpha) * _smoothedX;
       _smoothedY = alpha * y + (1 - alpha) * _smoothedY;
-       //_smoothedX = x;
-       //_smoothedY = y;
+
+      //_smoothedX = (_smoothedX / 540) * 1080;
+      //_smoothedY = (_smoothedY / 1097) * 2194;
 
       setState(() {
-        // if(info.gazeInfo.eyemovementState == EyemovementState.fixation) {
-        //   _x = info.gazeInfo.fixation.x;
-        //   _y = info.gazeInfo.fixation.y;
-        // }
-        // else {
-        //   _x = _smoothedX;
-        //   _y = _smoothedY;
-        // }
         _x = _smoothedX;
         _y = _smoothedY;
         _currentTrackingState = trackingState;
@@ -166,17 +149,6 @@ class _MyAppState extends State<MyApp> {
         }
       });
 
-      // try {
-      //   await _channel.invokeMethod('updateGaze', {
-      //     'x': _smoothedX,
-      //     'y': _smoothedY,
-      //     'isCalibrated': _isCalibrated && trackingState == TrackingState.success,
-      //   });
-      //   print("Gaze coordinates: ($_x, $_y), Smoothed: ($_smoothedX, $_smoothedY), Calibrated: $_isCalibrated, State: $trackingState");
-      // } catch (e) {
-      //   print("MethodChannel error: $e");
-      // }
-// hd: 394 865
       if (DateTime.now().difference(_lastUpdate).inMilliseconds >= 34) {
         try {
           await _channel.invokeMethod('updateGaze', {
@@ -210,8 +182,8 @@ class _MyAppState extends State<MyApp> {
         _statusMessage = "Overlay stopped. Restarting tracking...";
       });
       await _eyedidFlutterPlugin.stopTracking();
-      await _eyedidFlutterPlugin.startTracking();
-      await startOverlay();
+      //await _eyedidFlutterPlugin.startTracking();    ???!
+      //await startOverlay();                          ???!
     } catch (e) {
       print("Error stopping overlay: $e");
     }
@@ -244,6 +216,11 @@ class _MyAppState extends State<MyApp> {
                     ElevatedButton(
                       onPressed: stopOverlay,
                       child: const Text('Stop Overlay'),
+                    ),
+                  if (!_isTracking)
+                    ElevatedButton(
+                      onPressed: startOverlay,
+                      child: const Text('Start Overlay'),
                     ),
                 ],
               ),

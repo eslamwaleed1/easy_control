@@ -16,7 +16,8 @@ class DotView(context: Context) : View(context) {
     private var x: Float = 0f
     private var y: Float = 0f
     private var dotColor: Int = Color.RED
-    private val dotRadius = 10f
+    private val dotRadius = 20f
+
 
     private var maxX: Float = 1.0f
     private var minX: Float = 1.0f
@@ -60,26 +61,19 @@ class DotView(context: Context) : View(context) {
     }
 
     fun updateDot(x: Float, y: Float, isCalibrated: Boolean, screenState: String) {
-//        this.x = (x / 594f) * 1080f
-//        this.y = (y / 1040f) * 2194f
-
         // Awesome
-        this.x = (x / 540f) * 1080f
-        this.y = (y / 1097f) * 2194f
+//        this.x = (x / 540f) * 1080f
+//        this.y = (y / 1097f) * 2194f
 
-        //this.y *= (90f / 100f)
-
-        // Awesome?!
-//        this.x = (x / 500f) * 1080f
-//        this.y = (y / 1000f) * 2194f
+        this.x = x;
+        this.y = y;
 
         this.x = this.x.coerceIn(0f, 1080.0F)
         this.y = this.y.coerceIn(0f, 2194.0F)
 
 
 
-//        this.x = x;
-//        this.y = y;
+
 //
 //        if(x > maxX) maxX = x
 //        if(x < minX) minX = x
@@ -98,6 +92,7 @@ class DotView(context: Context) : View(context) {
         //Log.d("DotView", "Updating dot to ($x, $y) -> Screen ($this.x, $this.y), Calibrated: $isCalibrated, ScreenState: $screenState")
         //Log.d("DotView", "max X: $maxX, minX: $minX, maxY: $maxY, minY: $minY, sucMaxX: $maxXWithSuccess, sucMinX: $minXWithSuccess, sucMaxY: $maxYWithSuccess, sucMinY: $minYWithSuccess, ")
     }
+
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
