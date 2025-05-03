@@ -107,6 +107,9 @@ class GestureService : AccessibilityService() {
             val command = it.getStringExtra("command")?.lowercase()
             val x = it.getFloatExtra("x", 0f)
             val y = it.getFloatExtra("y", 0f)
+            if (x < 0 || y < 0) {
+                Log.e(TAG, "Negative coordinates detected: x=$x, y=$y")
+            }
             if (command == null || x == 0f || y == 0f) {
                 Log.e(TAG, "Dispatched tap at ($x, $y) is invalid.")
                 return@let
@@ -116,7 +119,7 @@ class GestureService : AccessibilityService() {
                 else -> Log.e(TAG, "Unknown command: $command")
             }
         } ?: Log.e(TAG, "Received null intent")
-        return START_STICKY // Changed to STICKY to restart if killed
+        return START_STICKY
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {

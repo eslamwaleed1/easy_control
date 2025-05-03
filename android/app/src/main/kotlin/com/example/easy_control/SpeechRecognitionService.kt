@@ -69,11 +69,11 @@ class SpeechRecognitionService : Service() {
 
             override fun onRmsChanged(rmsdB: Float) {
                 // Optional: Log for debugging audio levels
-                Log.v(TAG, "RMS changed: $rmsdB")
+                //Log.v(TAG, "RMS changed: $rmsdB")
             }
 
             override fun onBufferReceived(buffer: ByteArray?) {
-                Log.d(TAG, "Buffer received, length: ${buffer?.size ?: 0}")
+                //Log.d(TAG, "Buffer received, length: ${buffer?.size ?: 0}")
             }
 
             override fun onEndOfSpeech() {
