@@ -46,8 +46,8 @@ class MainActivity : FlutterActivity() {
                     // Clamp input to expected range
                     val clampedX = rawX.coerceIn(0f, 540f)
                     val clampedY = rawY.coerceIn(0f, 1097f)
-                    val scaledX = (clampedX / 540f) * 1080f
-                    val scaledY = (clampedY / 1097f) * 2194f
+                    val scaledX = (clampedX / 540f)
+                    val scaledY = (clampedY / 1097f)
                     //Log.d(TAG, "Raw: ($rawX, $rawY), Scaled: ($scaledX, $scaledY)")
                     val intent = Intent(this, OverlayService::class.java).apply {
                         action = "UPDATE_GAZE"

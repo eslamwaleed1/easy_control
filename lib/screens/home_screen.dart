@@ -1,14 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
-  final VoidCallback onFirstButtonPressed;
-  final VoidCallback onSecondButtonPressed;
+import '../main.dart';
 
-  const HomeScreen({
-    super.key,
-    required this.onFirstButtonPressed,
-    required this.onSecondButtonPressed,
-  });
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,35 +17,39 @@ class HomeScreen extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: onFirstButtonPressed,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                  minimumSize: const Size.fromHeight(50),
-                  backgroundColor: Colors.blueAccent,
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-                child: const Text("Calibrate"),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: onSecondButtonPressed,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                  minimumSize: const Size.fromHeight(50),
-                  backgroundColor: Colors.deepPurple,
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-                child: const Text("Open OS View"),
-              ),
-            ],
-          ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 1,
+          children: [
+            FeatureCard(
+              title: 'Eye Tracking',
+              icon: Icons.visibility,
+              color: Colors.blueAccent,
+              onTap: () {
+                Navigator.pushNamed(context, '/eye_tracking');
+              },
+            ),
+            FeatureCard(
+              title: 'Profile',
+              icon: Icons.person,
+              color: Colors.purple,
+              onTap: () {
+                print('Profile tapped - implement later');
+              },
+            ),
+            FeatureCard(
+              title: 'Voice Commands',
+              icon: Icons.mic,
+              color: Colors.red,
+              onTap: () {
+                print('Voice Commands tapped - implement later');
+              },
+            ),
+          ],
         ),
       ),
     );
