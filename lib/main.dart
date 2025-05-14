@@ -4,6 +4,7 @@ import 'package:easy_control/screens/home_screen.dart';
 import 'package:easy_control/screens/login_screen.dart';
 import 'package:easy_control/screens/profile_screen.dart';
 import 'package:easy_control/screens/register_screen.dart';
+import 'package:easy_control/screens/settings_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +17,8 @@ void main() async {
 
 Future<String> _getInitialRoute() async {
   final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('jwt_token');
+  // final token = prefs.getString('jwt_token');
+  final token = null;
   return token != null ? '/home' : '/login';
 }
 
@@ -51,6 +53,9 @@ class MyApp extends StatelessWidget {
             break;
           case '/feedback':
             builder = (context) => const FeedbackScreen();
+            break;
+          case '/settings':
+            builder = (context) => const SettingsScreen();
             break;
           case '/eye_tracking':
             builder = (context) => const EyeTrackingScreen();

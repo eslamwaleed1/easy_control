@@ -43,7 +43,7 @@ class MainActivity : FlutterActivity() {
                     val rawY = call.argument<Double>("y")?.toFloat() ?: 0f
                     val isCalibrated = call.argument<Boolean>("isCalibrated") ?: false
                     val screenState = call.argument<String>("screenState") ?: "unknown"
-                    Log.d(TAG, "Sending gaze update: ($rawX, $rawY), calibrated: $isCalibrated, state: $screenState")
+                    //Log.d(TAG, "Sending gaze update: ($rawX, $rawY), calibrated: $isCalibrated, state: $screenState")
                     val intent = Intent(this, OverlayService::class.java).apply {
                         action = "UPDATE_GAZE"
                         putExtra("x", rawX)

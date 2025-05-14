@@ -1,19 +1,30 @@
-import 'package:easy_control/screens/profile_screen.dart';
-import 'package:easy_control/screens/register_screen.dart';
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'eye_tracking_screen.dart';
-import 'login_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _speechEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text(
-          'Gaze Flow',
+          'Settings',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -27,37 +38,23 @@ class HomeScreen extends StatelessWidget {
           mainAxisSpacing: 16,
           childAspectRatio: 1,
           children: [
-            FeatureCard(
-              title: 'Eye Tracking',
-              icon: Icons.visibility,
-              color: Colors.blueAccent,
-              onTap: () {
-                Navigator.pushNamed(context, '/eye_tracking');
-              },
+            SettingsCard(
+              title: 'Camera',
+              icon: Icons.camera_alt,
+              color: Colors.blue,
+              onTap: () => AppSettings.openAppSettings(type: AppSettingsType.camera),
             ),
-            FeatureCard(
-              title: 'Profile',
-              icon: Icons.person,
+            SettingsCard(
+              title: 'Microphone',
+              icon: Icons.mic,
               color: Colors.green,
-              onTap: () {
-                Navigator.pushNamed(context, '/profile');
-              },
+              onTap: () => AppSettings.openAppSettings(type: AppSettingsType.settings),
             ),
-            FeatureCard(
-              title: "Feedback",
-              icon: Icons.feedback,
-              color: Colors.pink,
-              onTap: () {
-                Navigator.pushNamed(context, '/feedback');
-              },
-            ),
-            FeatureCard(
-              title: 'Settings',
-              icon: Icons.settings,
-              color: Colors.grey,
-              onTap: () {
-                Navigator.pushNamed(context, '/settings');
-              },
+            SettingsCard(
+              title: 'Accessibility',
+              icon: Icons.accessibility,
+              color: Colors.purple,
+              onTap: () => AppSettings.openAppSettings(type: AppSettingsType.accessibility),
             ),
           ],
         ),
@@ -66,13 +63,13 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class FeatureCard extends StatelessWidget {
+class SettingsCard extends StatelessWidget {
   final String title;
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
 
-  const FeatureCard({
+  const SettingsCard({
     super.key,
     required this.title,
     required this.icon,
@@ -85,8 +82,6 @@ class FeatureCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 100,
-        height: 100,
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(20),
@@ -117,7 +112,7 @@ class FeatureCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               semanticsLabel: title,
             ),
