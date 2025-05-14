@@ -28,7 +28,7 @@ class OverlayService : Service() {
     private var windowManager: WindowManager? = null
     private var overlayView: FrameLayout? = null
     private var dotView: DotView? = null
-//    private var dot1: CalmDot? = null
+    //    private var dot1: CalmDot? = null
 //    private var dot2: CalmDot? = null
 //    private var dot3: CalmDot? = null
 //    private var dot4: CalmDot? = null
@@ -156,14 +156,19 @@ class OverlayService : Service() {
                     val displayMetrics = resources.displayMetrics
                     val screenWidth = displayMetrics.widthPixels.toFloat()
                     val screenHeight = displayMetrics.heightPixels.toFloat()
-                    val x = it.getFloatExtra("x", 0f).coerceIn(0f, screenWidth)
-                    val y = it.getFloatExtra("y", 0f).coerceIn(0f, screenHeight)
-                    if (x == currentX && y == currentY) return@let
-                    currentX = x
-                    currentY = y
+                    // Assume input x is in range 0 to 540, y is in range 0 to 1097
+                    val rawX = it.getFloatExtra("x", 0f).coerceIn(0f, 540f)
+                    val rawY = it.getFloatExtra("y", 0f).coerceIn(0f, 1097f)
+                    // Scale to screen dimensions
+                    val scaledX = (rawX / 540f) * screenWidth
+                    val scaledY = (rawY / 1097f) * screenHeight
+                    if (scaledX == currentX && scaledY == currentY) return@let
+                    currentX = scaledX
+                    currentY = scaledY
                     val isCalibrated = it.getBooleanExtra("isCalibrated", false)
                     val screenState = it.getStringExtra("screenState") ?: "unknown"
-                    dotView?.updateDot(x, y, isCalibrated, screenState)
+                    Log.d(TAG, "Updating dot to ($scaledX, $scaledY), calibrated: $isCalibrated, state: $screenState")
+                    dotView?.updateDot(scaledX, scaledY, isCalibrated, screenState)
                 }
             }
         }

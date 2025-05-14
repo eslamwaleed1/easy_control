@@ -43,16 +43,11 @@ class MainActivity : FlutterActivity() {
                     val rawY = call.argument<Double>("y")?.toFloat() ?: 0f
                     val isCalibrated = call.argument<Boolean>("isCalibrated") ?: false
                     val screenState = call.argument<String>("screenState") ?: "unknown"
-                    // Clamp input to expected range
-                    val clampedX = rawX.coerceIn(0f, 540f)
-                    val clampedY = rawY.coerceIn(0f, 1097f)
-                    val scaledX = (clampedX / 540f)
-                    val scaledY = (clampedY / 1097f)
-                    //Log.d(TAG, "Raw: ($rawX, $rawY), Scaled: ($scaledX, $scaledY)")
+                    Log.d(TAG, "Sending gaze update: ($rawX, $rawY), calibrated: $isCalibrated, state: $screenState")
                     val intent = Intent(this, OverlayService::class.java).apply {
                         action = "UPDATE_GAZE"
-                        putExtra("x", scaledX)
-                        putExtra("y", scaledY)
+                        putExtra("x", rawX)
+                        putExtra("y", rawY)
                         putExtra("isCalibrated", isCalibrated)
                         putExtra("screenState", screenState)
                     }
