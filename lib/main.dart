@@ -24,7 +24,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _eyedidFlutterPlugin = EyedidFlutter();
-  static const String _licenseKey = "dev_ksoope3xnjczb23pijyn4j3b07qq5hxalrwhlh0z";
+  static const String _licenseKey = "dev_1vctvvvl7f3wvdl3xdkoz3u02eka5pte5dnbvmdl";
   static const MethodChannel _channel = MethodChannel('com.example.easy_control/overlay');
   bool _hasCameraPermission = false;
 

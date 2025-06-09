@@ -62,6 +62,20 @@ class OverlayService : Service() {
         "swipe left",
         "swipe up",
         "swipe down",
+
+        "home",
+
+        "back",
+        "go back",
+
+        "notifications",
+
+        "calendar",
+        "open calendar",
+        "calculator",
+        "open calculator",
+        "settings",
+        "open settings",
     )
 
     private val recognizedWordObserver = Observer<String> { recognizedWord ->
