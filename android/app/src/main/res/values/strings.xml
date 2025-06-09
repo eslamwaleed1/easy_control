@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="stop_overlay">Stop Overlay</string>
-    <string name="app_name">gaze_system_trial_three</string>
+    <string name="app_name">gaze flow</string>
     <string name="accessibility_service_description">This service enables voice-controlled gestures for eye tracking.</string>
 </resources>

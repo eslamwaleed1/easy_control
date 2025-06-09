@@ -68,7 +68,7 @@ class GestureService : AccessibilityService() {
             lineTo(x, y)
         }
 
-        val stroke = GestureDescription.StrokeDescription(path, 0, duration.toLong())  // OR REMOVE ".toLong()".
+        val stroke = GestureDescription.StrokeDescription(path, 0, 10)  // OR REMOVE ".toLong()".
         val gesture = builder
             .addStroke(stroke)
             .build()
@@ -173,6 +173,7 @@ class GestureService : AccessibilityService() {
                 "calculator" -> "advanced.scientific.calculator.calc991.plus"
                 "calendar" -> "com.samsung.android.calendar"
                 "settings" -> "com.android.settings"
+                "gaze" -> "com.example.easy_control"
                 "chrome" -> "com.android.chrome"
                 "youtube" -> "com.google.android.youtube"
                 "gallery" -> "com.google.android.gallery3d"
@@ -233,12 +234,13 @@ class GestureService : AccessibilityService() {
                 "swipe right" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.RIGHT, 500L, 1.5f)
                 "swipe up" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.UP, 500L, 1.5f)
                 "swipe down" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.DOWN, 500L, 1.5f)
-                "back", "go back" -> performGlobalAction(1)
+                "back", "go back", "return" -> performGlobalAction(1)
                 "home" -> performGlobalAction(2)
                 "notifications" -> performGlobalAction(3)
                 "calendar", "open calendar" -> openAppByName("calendar")
                 "calculator", "open calculator" -> openAppByName("calculator")
                 "settings", "open settings" -> openAppByName("settings")
+                "gaze", "gaze flow", "open gaze flow", "open gaze", "return to app" -> openAppByName("settings")
 
                 else -> Log.e(TAG, "Unknown command: $command")
             }

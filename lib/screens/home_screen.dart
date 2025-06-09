@@ -1,55 +1,134 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/settings_service.dart';
 
 class HomeScreen extends StatelessWidget {
-  final VoidCallback onFirstButtonPressed;
-  final VoidCallback onSecondButtonPressed;
+  const HomeScreen({super.key});
 
-  const HomeScreen({
+  @override
+  Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          settings.translate('Gaze Flow'),
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          semanticsLabel: settings.translate('Gaze Flow'),
+        ),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 1,
+          children: [
+            FeatureCard(
+              title: settings.translate('Eye Tracking'),
+              icon: Icons.visibility,
+              color: Colors.blueAccent,
+              onTap: () {
+                Navigator.pushNamed(context, '/eye_tracking');
+              },
+            ),
+            FeatureCard(
+              title: settings.translate('Profile'),
+              icon: Icons.person,
+              color: Colors.green,
+              onTap: () {
+                Navigator.pushNamed(context, '/profile');
+              },
+            ),
+            FeatureCard(
+              title: settings.translate('Feedback'),
+              icon: Icons.feedback,
+              color: Colors.pink,
+              onTap: () {
+                Navigator.pushNamed(context, '/feedback');
+              },
+            ),
+            FeatureCard(
+              title: settings.translate('Settings'),
+              icon: Icons.settings,
+              color: Colors.grey,
+              onTap: () {
+                Navigator.pushNamed(context, '/settings');
+              },
+            ),
+            FeatureCard(
+              title: settings.translate('Commands'),
+              icon: Icons.voice_chat_rounded,
+              color: Colors.purple,
+              onTap: () {
+                Navigator.pushNamed(context, '/commands');
+              },
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FeatureCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const FeatureCard({
     super.key,
-    required this.onFirstButtonPressed,
-    required this.onSecondButtonPressed,
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Gaze Tracker',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.4),
+              blurRadius: 5,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
-        centerTitle: true,
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: onFirstButtonPressed,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                  minimumSize: const Size.fromHeight(50),
-                  backgroundColor: Colors.blueAccent,
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-                child: const Text("Calibrate"),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 40,
+              color: Colors.white,
+              semanticLabel: '$title icon',
+            ),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: onSecondButtonPressed,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                  minimumSize: const Size.fromHeight(50),
-                  backgroundColor: Colors.deepPurple,
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-                child: const Text("Open OS View"),
-              ),
-            ],
-          ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              semanticsLabel: title,
+            ),
+          ],
         ),
       ),
     );

@@ -28,13 +28,6 @@ class OverlayService : Service() {
     private var windowManager: WindowManager? = null
     private var overlayView: FrameLayout? = null
     private var dotView: DotView? = null
-    //    private var dot1: CalmDot? = null
-//    private var dot2: CalmDot? = null
-//    private var dot3: CalmDot? = null
-//    private var dot4: CalmDot? = null
-//    private var dot5: CalmDot? = null
-//    private var dot6: CalmDot? = null
-//    private var dot7: CalmDot? = null
     private var stopButton: Button? = null
     private var isRunning = false
     private val TAG = "OverlayService"
@@ -67,15 +60,24 @@ class OverlayService : Service() {
 
         "back",
         "go back",
+        "return",
 
         "notifications",
 
         "calendar",
         "open calendar",
+
         "calculator",
         "open calculator",
+
         "settings",
         "open settings",
+
+        "gaze",
+        "open gaze",
+        "gaze flow",
+        "open gaze flow",
+        "return to app",
     )
 
     private val recognizedWordObserver = Observer<String> { recognizedWord ->
@@ -151,7 +153,10 @@ class OverlayService : Service() {
                 WindowManager.LayoutParams.TYPE_PHONE,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR or
+                    WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
             PixelFormat.TRANSLUCENT
         )
 
@@ -162,7 +167,9 @@ class OverlayService : Service() {
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else
                 WindowManager.LayoutParams.TYPE_PHONE,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.END
@@ -173,6 +180,7 @@ class OverlayService : Service() {
             windowManager?.addView(stopButtonView, buttonParams)
             overlayView?.addView(dotView)
         } catch (e: Exception) {
+            Log.e(TAG, "Error adding views: ${e.message}")
             stopSelf()
         }
 
@@ -180,7 +188,9 @@ class OverlayService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (!isRunning) return START_NOT_STICKY
+        if (!isRunning) {
+            onCreate()
+        }
         intent?.let {
             when (it.action) {
                 "UPDATE_GAZE" -> {
@@ -198,23 +208,19 @@ class OverlayService : Service() {
                 }
             }
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        isRunning = false
         try {
             windowManager?.removeView(overlayView)
             windowManager?.removeView(stopButtonView)
-            SpeechRecognitionLiveData.recognizedWord.removeObserver(recognizedWordObserver)
-            stopForeground(true)
-        } catch (e: Exception) {}
-        overlayView = null
-        dotView = null
-        stopButton = null
-        stopButtonView = null
-        windowManager = null
-        isRunning = false
+        } catch (e: Exception) {
+            Log.e(TAG, "Error removing views: ${e.message}")
+        }
+        SpeechRecognitionLiveData.recognizedWord.removeObserver(recognizedWordObserver)
     }
 
     // For voice recognition & gesture simulation:
@@ -235,22 +241,24 @@ class OverlayService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Overlay Service",
+                "Overlay Service Channel",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Channel for overlay service"
+                description = "Channel for eye tracking overlay service"
+                setShowBadge(false)
             }
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
         }
     }
 
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Overlay Service")
-            .setContentText("Overlay active...")
-            //.setSmallIcon(android.R.drawable.ic_notification_active)
+            .setContentTitle("Eye Tracking Active")
+            .setContentText("Eye tracking overlay is running")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOngoing(true)
             .build()
     }
     // -------------------------

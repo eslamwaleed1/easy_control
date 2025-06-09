@@ -9,6 +9,8 @@ import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.embedding.engine.FlutterEngine
+import android.view.WindowManager
+
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.example.easy_control/overlay"
@@ -88,6 +90,10 @@ class MainActivity : FlutterActivity() {
         } else {
             startService(serviceIntent)
         }
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
     }
     // -----------------------
 }
