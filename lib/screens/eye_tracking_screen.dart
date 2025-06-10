@@ -206,63 +206,197 @@ class _EyeTrackingScreenState extends State<EyeTrackingScreen> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(settings.translate('Eye Tracking')),
-        backgroundColor: Colors.blueAccent,
+        title: Text(
+          settings.translate('Eye Tracking'),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          semanticsLabel: settings.translate('Eye Tracking'),
+        ),
+        centerTitle: true,
+        elevation: 0,
       ),
-      body: Center(
+      body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                _statusMessage,
-                style: theme.textTheme.bodyMedium!.copyWith(fontSize: 18),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    settings.translate('Eye Tracking') + ':',
-                    style: theme.textTheme.bodyMedium!.copyWith(fontSize: 18),
-                  ),
-                  const SizedBox(width: 10),
-                  Switch(
-                    value: _isTracking,
-                    onChanged:
-                        _hasCameraPermission && _isInitialized
-                            ? (value) =>
-                                value ? _startOverlay() : _stopOverlay()
-                            : null,
-                    activeColor: Colors.blueAccent,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Text(
-                '${settings.translate('Gaze')}: (${_smoothedX.toStringAsFixed(1)}, ${_smoothedY.toStringAsFixed(1)})',
-                style: theme.textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 24,
-                  ),
-                  backgroundColor: Colors.blueAccent,
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
-                  settings.translate('Back to Home'),
-                  style: const TextStyle(fontSize: 16),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            settings.translate('Status'),
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  _isTracking
+                                      ? Colors.green.withOpacity(0.2)
+                                      : Colors.red.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              _isTracking
+                                  ? settings.translate('Active')
+                                  : settings.translate('Inactive'),
+                              style: TextStyle(
+                                color: _isTracking ? Colors.green : Colors.red,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _statusMessage,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.textTheme.bodyLarge?.color?.withOpacity(
+                            0.7,
+                          ),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        settings.translate('Gaze Position'),
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildCoordinateDisplay(
+                            'X',
+                            _smoothedX.toStringAsFixed(1),
+                            theme,
+                          ),
+                          _buildCoordinateDisplay(
+                            'Y',
+                            _smoothedY.toStringAsFixed(1),
+                            theme,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Expanded(
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          settings.translate('Controls'),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed:
+                                _hasCameraPermission && _isInitialized
+                                    ? (_isTracking
+                                        ? _stopOverlay
+                                        : _startOverlay)
+                                    : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  _isTracking ? Colors.red : Colors.green,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 4,
+                            ),
+                            child: Text(
+                              _isTracking
+                                  ? settings.translate('Stop Tracking')
+                                  : settings.translate('Start Tracking'),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildCoordinateDisplay(String label, String value, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      decoration: BoxDecoration(
+        color: theme.primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.primaryColor,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }

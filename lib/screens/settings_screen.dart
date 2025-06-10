@@ -12,157 +12,242 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _speechEnabled = true;
-
-  @override
-  void initState() {
-    super.initState();
-
-  }
-
   @override
   Widget build(BuildContext context) {
     final settings = Provider.of<SettingsProvider>(context);
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           settings.translate('Settings'),
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           semanticsLabel: settings.translate('Settings'),
         ),
         centerTitle: true,
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-
-              children: [
-                SettingsCard(
-                  title: settings.translate('Camera'),
-                  icon: Icons.camera_alt,
-                  color: Colors.blue,
-                  onTap: () => AppSettings.openAppSettings(type: AppSettingsType.settings),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                settings.translate('App Settings'),
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.primaryColor,
                 ),
-                SizedBox(height: 10,),
-                SettingsCard(
-                  title: settings.translate('Microphone'),
-                  icon: Icons.mic,
-                  color: Colors.green,
-                  onTap: () => AppSettings.openAppSettings(type: AppSettingsType.settings),
-                ),SizedBox(height: 10,),
-                SettingsCard(
-                  title: settings.translate('Accessibility'),
-                  icon: Icons.accessibility,
-                  color: Colors.purple,
-                  onTap: () => AppSettings.openAppSettings(type: AppSettingsType.accessibility),
-                ),SizedBox(height: 10,),
-              ],
-            ),
-            SwitchListTile(
-              title: Text(
-                settings.translate('Dark Mode'),
-                semanticsLabel: settings.translate('Dark Mode'),
               ),
-              value: settings.isDarkMode,
-              onChanged: (value) => settings.toggleDarkMode(value),
-              activeColor: Colors.blueAccent,
-            ),SizedBox(height: 10,),
-            DropdownButtonFormField<String>(
-              value: settings.language,
-              decoration: InputDecoration(
-                labelText: settings.translate('Language'),
+              const SizedBox(height: 8),
+              Text(
+                settings.translate('Customize your experience'),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.textTheme.bodyLarge?.color?.withOpacity(0.7),
+                ),
               ),
-              items: ['English', 'Arabic']
-                  .map((lang) => DropdownMenuItem(value: lang, child: Text(lang)))
-                  .toList(),
-              onChanged: (value) => settings.setLanguage(value!),
-            ),
-            DropdownButtonFormField<String>(
-              value: settings.timeZone,
-              decoration: InputDecoration(
-                labelText: settings.translate('Time Zone'),
+              const SizedBox(height: 32),
+              Expanded(
+                child: ListView(
+                  children: [
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              settings.translate('Permissions'),
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildPermissionCard(
+                              context,
+                              settings.translate('Camera'),
+                              Icons.camera_alt,
+                              Colors.blue,
+                              () => AppSettings.openAppSettings(
+                                type: AppSettingsType.settings,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _buildPermissionCard(
+                              context,
+                              settings.translate('Microphone'),
+                              Icons.mic,
+                              Colors.green,
+                              () => AppSettings.openAppSettings(
+                                type: AppSettingsType.settings,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _buildPermissionCard(
+                              context,
+                              settings.translate('Accessibility'),
+                              Icons.accessibility,
+                              Colors.purple,
+                              () => AppSettings.openAppSettings(
+                                type: AppSettingsType.accessibility,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              settings.translate('Appearance'),
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            SwitchListTile(
+                              title: Text(
+                                settings.translate('Dark Mode'),
+                                style: theme.textTheme.titleMedium,
+                              ),
+                              subtitle: Text(
+                                settings.translate('Enable dark theme'),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.textTheme.bodyMedium?.color
+                                      ?.withOpacity(0.7),
+                                ),
+                              ),
+                              value: settings.isDarkMode,
+                              onChanged:
+                                  (value) => settings.toggleDarkMode(value),
+                              activeColor: theme.primaryColor,
+                            ),
+                            const Divider(),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    settings.translate('Language'),
+                                    style: theme.textTheme.titleMedium,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  DropdownButtonFormField<String>(
+                                    value: settings.language,
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 12,
+                                          ),
+                                    ),
+                                    items:
+                                        ['English', 'Arabic']
+                                            .map(
+                                              (lang) => DropdownMenuItem(
+                                                value: lang,
+                                                child: Text(lang),
+                                              ),
+                                            )
+                                            .toList(),
+                                    onChanged:
+                                        (value) => settings.setLanguage(value!),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              items: ['UTC', 'EST', 'PST']
-                  .map((tz) => DropdownMenuItem(value: tz, child: Text(tz)))
-                  .toList(),
-              onChanged: (value) => settings.setTimeZone(value!),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Text(
-                '${settings.translate('Current Time')}: ${DateTime.now().toString().split('.')[0]} (${settings.timeZone})',
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-                semanticsLabel: '${settings.translate('Current Time')} ${settings.timeZone}',
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
-class SettingsCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-
-  const SettingsCard({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.4),
-              blurRadius: 5, // Reduced for performance
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 40,
-              color: Colors.white,
-              semanticLabel: '$title icon',
-            ),
-            const SizedBox(height: 5),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+  Widget _buildPermissionCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 24),
               ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              semanticsLabel: title,
-            ),
-          ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Tap to manage permissions',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withOpacity(0.5),
+              ),
+            ],
+          ),
         ),
       ),
     );
