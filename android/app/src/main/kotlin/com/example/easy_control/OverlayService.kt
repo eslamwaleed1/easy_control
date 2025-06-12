@@ -1,5 +1,6 @@
 package com.example.easy_control
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -52,9 +53,19 @@ class OverlayService : Service() {
         "hold until",
 
         "swipe right",
+        "go left",
+
         "swipe left",
+        "go right",
+
         "swipe up",
+        "go up",
+
         "swipe down",
+        "go down",
+
+        "scroll",
+        "scroll down",
 
         "home",
 
@@ -63,6 +74,8 @@ class OverlayService : Service() {
         "return",
 
         "notifications",
+        "running apps",
+        "running",
 
         "calendar",
         "open calendar",
@@ -72,6 +85,14 @@ class OverlayService : Service() {
 
         "settings",
         "open settings",
+
+        "gallery",
+        "Gallery",
+        "images",
+
+        "Youtube",
+        "YouTube",
+        "youtube",
 
         "gaze",
         "open gaze",
@@ -187,6 +208,7 @@ class OverlayService : Service() {
         SpeechRecognitionLiveData.recognizedWord.observeForever(recognizedWordObserver)
     }
 
+    @SuppressLint("NewApi")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (!isRunning) {
             onCreate()

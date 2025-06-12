@@ -97,6 +97,12 @@ class GestureService : AccessibilityService() {
             Log.e(TAG, "Dispatched ${if (hold) "hold" else "tap"} at ($x, $y) failed.")
         }
     }
+    private fun performTouchTwice(x: Float, y: Float) {
+        performTouch(x, y, hold = false)
+        Handler(Looper.getMainLooper()).postDelayed({
+            performTouch(x, y, hold = false)
+        }, 300L)
+    }
     private fun performSwipe(
         startX: Float,
         startY: Float,
@@ -229,14 +235,16 @@ class GestureService : AccessibilityService() {
             }
             when (command) {
                 "tap", "press", "open" -> performTouch(x, y)
+                "double press", "double tap", "twice" -> performTouchTwice(x, y)
                 "hold", "long tap", "long press" -> performTouch(x, y, true)
-                "swipe left" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.LEFT, 500L, 1.5f)
-                "swipe right" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.RIGHT, 500L, 1.5f)
-                "swipe up" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.UP, 500L, 1.5f)
-                "swipe down" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.DOWN, 500L, 1.5f)
+                "swipe left", "go right" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.LEFT, 500L, 1.5f)
+                "swipe right", "go left" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.RIGHT, 500L, 1.5f)
+                "swipe up", "go down" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.UP, 500L, 1.5f)
+                "swipe down", "go up" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.DOWN, 500L, 1.5f)
+                "scroll", "scroll down" -> performDirectionalSwipe(x, y, 1300f, SwipeDirection.UP, 700L, 1.5f)
                 "back", "go back", "return" -> performGlobalAction(1)
                 "home" -> performGlobalAction(2)
-                "notifications" -> performGlobalAction(3)
+                "notifications", "running", "running apps" -> performGlobalAction(3)
                 "calendar", "open calendar" -> openAppByName("calendar")
                 "calculator", "open calculator" -> openAppByName("calculator")
                 "settings", "open settings" -> openAppByName("settings")
