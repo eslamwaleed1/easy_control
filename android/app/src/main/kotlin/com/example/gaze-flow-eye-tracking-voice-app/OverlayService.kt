@@ -44,7 +44,7 @@ class OverlayService : Service() {
         "tap",
         "press",
 
-        "disable",
+        "disable", "360", "Wikipedia",
 
         "hold",
         "long tap",
@@ -88,11 +88,15 @@ class OverlayService : Service() {
 
         "gallery",
         "Gallery",
+        "IMDb",
+        "chrome",
+        "Chrome",
+        "360",
+        "YouTube",
+        "Youtube",
         "images",
 
-        "Youtube",
-        "YouTube",
-        "youtube",
+        "twice", "double press",
 
         "gaze",
         "open gaze",

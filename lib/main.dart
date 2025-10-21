@@ -25,9 +25,9 @@ void main() async {
 
 Future<String> _getInitialRoute() async {
   final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('jwt_token');
   // final token = null;
-  // return token != null ? '/home' : '/login';
-  return '/home';
+  return token != null ? '/home' : '/login';
 }
 
 class MyApp extends StatelessWidget {

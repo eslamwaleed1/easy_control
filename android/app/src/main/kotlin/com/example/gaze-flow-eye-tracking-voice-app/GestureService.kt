@@ -26,17 +26,6 @@ class GestureService : AccessibilityService() {
         private const val TAG = "GestureService"
         private const val NOTIFICATION_ID = 2
         private const val CHANNEL_ID = "GestureServiceChannel"
-
-        fun isServiceRunning(): Boolean {
-            val isRunning = instance != null
-            Log.d(TAG, "isServiceRunning: $isRunning")
-            return isRunning
-        }
-
-        fun simulateTouch(x: Float, y: Float) {
-            Log.d(TAG, "simulateTouch called with x=$x, y=$y")
-            instance?.performTouch(x, y)
-        }
     }
 
     override fun onServiceConnected() {
@@ -101,14 +90,15 @@ class GestureService : AccessibilityService() {
         performTouch(x, y, hold = false)
         Handler(Looper.getMainLooper()).postDelayed({
             performTouch(x, y, hold = false)
-        }, 300L)
+        }, 100L)
     }
+
     private fun performSwipe(
         startX: Float,
         startY: Float,
         endX: Float,
         endY: Float,
-        durationMs: Long = 500L // Default swipe duration
+        durationMs: Long = 500L
     ) {
         val builder = GestureDescription.Builder()
 
@@ -149,7 +139,6 @@ class GestureService : AccessibilityService() {
         }
     }
 
-    // Convenience function for directional swipes
     enum class SwipeDirection { UP, DOWN, LEFT, RIGHT }
 
     fun performDirectionalSwipe(
@@ -177,12 +166,18 @@ class GestureService : AccessibilityService() {
             // Simple mapping of common app names to package names
             val packageName = when (appName.lowercase()) {
                 "calculator" -> "advanced.scientific.calculator.calc991.plus"
+
                 "calendar" -> "com.samsung.android.calendar"
+                "youtube" -> "com.google.android.youtube"
+                "gallery" -> "com.sec.android.gallery3d"
+                "imdb" -> "com.imdb.mobile"
+                "360" -> "com.scores365"
+                "wikipedia" -> "org.wikipedia"
+
+                "chrome" -> "com.android.chrome"
+
                 "settings" -> "com.android.settings"
                 "gaze" -> "com.example.easy_control"
-                "chrome" -> "com.android.chrome"
-                "youtube" -> "com.google.android.youtube"
-                "gallery" -> "com.google.android.gallery3d"
 
 
                 else -> {
@@ -220,6 +215,7 @@ class GestureService : AccessibilityService() {
         } ?: Log.e(TAG, "No valid intent to launch app: $appName")
     }
 
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand called with intent: $intent")
         intent?.let {
@@ -235,20 +231,33 @@ class GestureService : AccessibilityService() {
             }
             when (command) {
                 "tap", "press", "open" -> performTouch(x, y)
-                "double press", "double tap", "twice" -> performTouchTwice(x, y)
-                "hold", "long tap", "long press" -> performTouch(x, y, true)
-                "swipe left", "go right" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.LEFT, 500L, 1.5f)
-                "swipe right", "go left" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.RIGHT, 500L, 1.5f)
-                "swipe up", "go down" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.UP, 500L, 1.5f)
-                "swipe down", "go up" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.DOWN, 500L, 1.5f)
-                "scroll", "scroll down" -> performDirectionalSwipe(x, y, 1300f, SwipeDirection.UP, 700L, 1.5f)
+                "double press", "double tap", "twice" -> performTouchTwice(x, y)    //Not
+                "hold", "long tap", "long press" -> performTouch(x, y, true)    //Not
+
+                "go right" -> performDirectionalSwipe(540f, 1200f, 500f, SwipeDirection.LEFT, 500L, 1.5f)
+                "go left" -> performDirectionalSwipe(540f, 1200f, 500f, SwipeDirection.RIGHT, 500L, 1.5f)
+                "go down" -> performDirectionalSwipe(540f, 1200f, 500f, SwipeDirection.UP, 500L, 1.5f)
+                "go up" -> performDirectionalSwipe(540f, 1200f, 500f, SwipeDirection.DOWN, 500L, 1.5f)
+
+                "swipe left" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.LEFT, 500L, 1.5f)
+                "swipe right" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.RIGHT, 500L, 1.5f)
+                "swipe up" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.UP, 500L, 1.5f)
+                "swipe down" -> performDirectionalSwipe(x, y, 500f, SwipeDirection.DOWN, 500L, 1.5f)
+
+                "scroll" -> performDirectionalSwipe(x, y, 1300f, SwipeDirection.UP, 1300L, 1.5f)
+
                 "back", "go back", "return" -> performGlobalAction(1)
                 "home" -> performGlobalAction(2)
                 "notifications", "running", "running apps" -> performGlobalAction(3)
                 "calendar", "open calendar" -> openAppByName("calendar")
-                "calculator", "open calculator" -> openAppByName("calculator")
+                "IMDb" -> openAppByName("IMDb")
+                "Wikipedia" -> openAppByName("Wikipedia")
+                "YouTube", "Youtube" -> openAppByName("YouTube")
+                "360" -> openAppByName("360")
+                "gallery", "Gallery" -> openAppByName("gallery")
+                "Gmail" -> openAppByName("Gmail")
                 "settings", "open settings" -> openAppByName("settings")
-                "gaze", "gaze flow", "open gaze flow", "open gaze", "return to app" -> openAppByName("settings")
+                "gaze", "gaze flow", "open gaze flow", "open gaze", "return to app" -> openAppByName("gaze")
 
                 else -> Log.e(TAG, "Unknown command: $command")
             }

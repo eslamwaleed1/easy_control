@@ -1,5 +1,5 @@
-name: easy_control
-description: "The eye tracking project."
+name: gaze-flow-eye-tracking-voice-app
+description: "An app that combines eye-tracking with voice commands to achieve full control over mobile phones."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

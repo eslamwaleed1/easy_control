@@ -37,6 +37,46 @@ class CommandsScreen extends StatelessWidget {
         'command': 'long press',
         'description': 'Performs a longer touch at a specific point',
       },
+      {
+        'command': 'twice',
+        'description': 'Performs a double touch at a specific point',
+      },
+      {
+        'command': 'double tap',
+        'description': 'Performs a double touch at a specific point',
+      },
+      {
+        'command': 'double press',
+        'description': 'Performs a double touch at a specific point',
+      },
+      {
+        'command': 'swipe left',
+        'description': 'Performs a swipe at a specific point',
+      },
+      {
+        'command': 'swipe right',
+        'description': 'Performs a swipe at a specific point',
+      },
+      {
+        'command': 'swipe up',
+        'description': 'Performs a swipe at a specific point',
+      },
+      {
+        'command': 'swipe down',
+        'description': 'Performs a swipe at a specific point',
+      },
+      {
+        'command': 'home',
+        'description': 'Goes to home screen',
+      },
+      {
+        'command': 'go back',
+        'description': 'Goes back one time',
+      },
+      {
+        'command': 'running',
+        'description': 'Opens notifications',
+      },
     ];
 
     return Scaffold(

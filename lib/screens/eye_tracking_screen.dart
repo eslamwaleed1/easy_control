@@ -21,7 +21,7 @@ class EyeTrackingScreen extends StatefulWidget {
 class _EyeTrackingScreenState extends State<EyeTrackingScreen> {
   final _eyedidFlutterPlugin = EyedidFlutter();
   static const String _licenseKey =
-      "dev_1vctvvvl7f3wvdl3xdkoz3u02eka5pte5dnbvmdl";
+      "dev_2jp939383vbez8qqgkqz6ecuoc4x2299460vct7m";
   static const MethodChannel _channel = MethodChannel(
     'com.example.easy_control/overlay',
   );
